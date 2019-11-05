@@ -1,6 +1,6 @@
-package tbui
+package tcui
 
-import termbox "github.com/nsf/termbox-go"
+import "github.com/gdamore/tcell"
 
 //
 type If struct {
@@ -64,7 +64,7 @@ func (ifl *If) NextFocusable(current Focusable) Focusable {
 }
 
 //
-func (ifl *If) FocusClicked(ev termbox.Event) Focusable {
+func (ifl *If) FocusClicked(ev tcell.EventMouse) Focusable {
 	if ifl.Cond() {
 		if clickable, ok := ifl.Child.(Clickable); ok {
 			clickable.HandleClick(ev)

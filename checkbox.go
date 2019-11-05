@@ -1,11 +1,13 @@
-package tbui
+package tcui
 
 import (
-	termbox "github.com/nsf/termbox-go"
+	"github.com/gdamore/tcell"
 )
 
 //
 type CheckBox struct {
+	Screen tcell.Screen
+
 	Checked bool
 	Symbol  rune
 	Padding Padding
@@ -17,12 +19,14 @@ type CheckBox struct {
 func (cb *CheckBox) Draw(x, y int, focused Element) {
 	x, y = x+cb.Padding.Left(), y+cb.Padding.Up()
 
-	var checkCol = termbox.ColorBlack | termbox.AttrBold
+	style1 := tcell.StyleDefault.Foreground(Red).Background(LightBlack)   // default style with check
+	style2 := tcell.StyleDefault.Foreground(LightBlack).Background(Black) // style with special width chars
 	if focused == cb {
-		checkCol = termbox.ColorWhite
+		style1 = tcell.StyleDefault.Foreground(White).Background(LightBlack)
+		style2 = tcell.StyleDefault.Foreground(LightBlack).Background(Black)
 	}
 
-	var mark rune = ' '
+	mark := ' '
 	if cb.Checked {
 		if cb.Symbol != 0 {
 			mark = cb.Symbol
@@ -31,9 +35,9 @@ func (cb *CheckBox) Draw(x, y int, focused Element) {
 		}
 	}
 
-	termbox.SetCell(x, y, '▐', checkCol, termbox.ColorDefault)
-	termbox.SetCell(x+1, y, mark, termbox.ColorRed, checkCol)
-	termbox.SetCell(x+2, y, '▌', checkCol, termbox.ColorDefault)
+	cb.Screen.SetContent(x, y, '▐', nil, style2)
+	cb.Screen.SetContent(x+1, y, mark, nil, style1)
+	cb.Screen.SetContent(x+2, y, '▌', nil, style2)
 }
 
 //
@@ -42,22 +46,21 @@ func (cb *CheckBox) Size() (int, int) {
 }
 
 //
-func (cb *CheckBox) Handle(ev termbox.Event) {
-	switch ev.Key {
-	case termbox.KeySpace:
+func (cb *CheckBox) Handle(ev tcell.EventKey) {
+	if ev.Rune() == ' ' {
 		cb.check()
-	case termbox.KeyEnter:
-		if cb.Submit != nil {
-			cb.Submit()
-		}
+	} else if ev.Key() == tcell.KeyEnter && cb.Submit != nil {
+		cb.Submit()
 	}
 }
 
 //
-func (cb *CheckBox) HandleClick(ev termbox.Event) {
+func (cb *CheckBox) HandleClick(ev tcell.EventMouse) {
 	//fmt.Println("checkbox", mouseX, mouseY, cb.Padding)
-	if ev.MouseX >= cb.Padding.Left() && ev.MouseX < cb.Padding.Left()+3 && ev.MouseY >= cb.Padding.Up() && ev.MouseY < cb.Padding.Up()+1 {
-		cb.check()
+	if ev.Buttons() == tcell.Button1 {
+		if x, y := ev.Position(); x >= cb.Padding.Left() && x < cb.Padding.Left()+3 && y >= cb.Padding.Up() && y < cb.Padding.Up()+1 {
+			cb.check()
+		}
 	}
 }
 

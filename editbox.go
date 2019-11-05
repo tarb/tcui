@@ -1,12 +1,13 @@
-package tbui
+package tcui
 
 import (
 	"github.com/atotto/clipboard"
-	termbox "github.com/nsf/termbox-go"
+	"github.com/gdamore/tcell"
 )
 
 //
 type EditBox struct {
+	Screen      tcell.Screen
 	Width       int
 	MaxSize     int
 	HideContent bool
@@ -26,17 +27,24 @@ type EditBox struct {
 func (eb *EditBox) Draw(x, y int, focused Element) {
 	x, y = x+eb.Padding.Left(), y+1 // so x ==0 && y ==0 is the location of the first char
 
+	style1 := tcell.StyleDefault.Foreground(Gray).Background(LightBlack)  // default style with text
+	style2 := tcell.StyleDefault.Foreground(LightBlack).Background(Black) // style with special width chars
+	if focused == eb {
+		style1 = tcell.StyleDefault.Foreground(White).Background(LightBlack)
+	}
+	cursorStyle := tcell.StyleDefault.Foreground(Black).Background(White) // style with special width chars
+
 	//draw background box
 	for i := -eb.Padding.Left(); i < eb.Width+eb.Padding.Right(); i++ {
-		termbox.SetCell(x+i, y-1, '▄', termbox.ColorBlack|termbox.AttrBold, termbox.ColorDefault)
-		termbox.SetCell(x+i, y, ' ', termbox.ColorBlack|termbox.AttrBold, termbox.ColorBlack|termbox.AttrBold)
-		termbox.SetCell(x+i, y+1, '▀', termbox.ColorBlack|termbox.AttrBold, termbox.ColorDefault)
+		eb.Screen.SetContent(x+i, y-1, '▄', nil, style2)
+		eb.Screen.SetContent(x+i, y, ' ', nil, style1)
+		eb.Screen.SetContent(x+i, y+1, '▀', nil, style2)
 	}
 
 	//placeholder text
 	if len(eb.text) == 0 && focused != eb {
 		for i, c := range eb.PlaceHolder {
-			termbox.SetCell(x+i, y, c, termbox.ColorDefault, termbox.ColorBlack|termbox.AttrBold)
+			eb.Screen.SetContent(x+i, y, c, nil, style1)
 		}
 	}
 
@@ -65,20 +73,20 @@ func (eb *EditBox) Draw(x, y int, focused Element) {
 		}
 
 		if i+start == eb.cursorIdx && focused == eb {
-			termbox.SetCell(x+i, y, c, termbox.ColorBlack|termbox.AttrBold, termbox.ColorWhite)
+			eb.Screen.SetContent(x+i, y, c, nil, cursorStyle)
 		} else {
-			termbox.SetCell(x+i, y, c, termbox.ColorDefault, termbox.ColorBlack|termbox.AttrBold)
+			eb.Screen.SetContent(x+i, y, c, nil, style1)
 		}
 	}
 
 	if eb.cursorIdx == stop && focused == eb {
-		termbox.SetCell(x+stop-start, y, ' ', termbox.ColorBlack, termbox.ColorWhite)
+		eb.Screen.SetContent(x+stop-start, y, ' ', nil, cursorStyle)
 	}
 	if eb.windowIdx > 0 {
-		termbox.SetCell(x, y, '…', termbox.ColorDefault, termbox.ColorBlack)
+		eb.Screen.SetContent(x, y, '…', nil, style1)
 	}
 	if eb.windowIdx+eb.Width < len(eb.text) && (!(focused == eb) || eb.cursorIdx-eb.windowIdx != eb.Width-1) { // dont show elipise if cursor is on far right
-		termbox.SetCell(x+eb.Width-1, y, '…', termbox.ColorDefault, termbox.ColorBlack)
+		eb.Screen.SetContent(x+eb.Width-1, y, '…', nil, style1)
 	}
 }
 
@@ -93,61 +101,61 @@ func (eb *EditBox) ExpandSize() (int, int) {
 }
 
 //
-func (eb *EditBox) Handle(ev termbox.Event) {
-	switch ev.Key {
-	case termbox.KeyEnter:
+func (eb *EditBox) Handle(ev tcell.EventKey) {
+	switch k := ev.Key(); k {
+	case tcell.KeyEnter:
 		if eb.Submit != nil {
 			eb.Submit()
 		}
-	case termbox.KeyCtrlC:
+	case tcell.KeyCtrlC:
 		clipboard.WriteAll(eb.Text())
-	case termbox.KeyCtrlV:
+	case tcell.KeyCtrlV:
 		if v, err := clipboard.ReadAll(); err == nil && v != "" {
 			for _, r := range v {
 				eb.insert(r)
 			}
 			eb.updateBind()
 		}
-	case termbox.KeyArrowLeft:
+	case tcell.KeyLeft:
 		eb.cursorLeft()
-	case termbox.KeyArrowRight:
+	case tcell.KeyRight:
 		eb.cursorRight()
-	case termbox.KeyBackspace, termbox.KeyBackspace2:
+	case tcell.KeyBackspace, tcell.KeyBackspace2:
 		eb.backSpace()
 		eb.updateBind()
-	case termbox.KeyDelete, termbox.KeyCtrlD:
+	case tcell.KeyDelete, tcell.KeyCtrlD:
 		eb.delete()
 		eb.updateBind()
-	case termbox.KeySpace:
-		eb.insert(' ')
-		eb.updateBind()
 	default:
-		if ev.Ch != 0 {
-			eb.insert(ev.Ch)
+		if r := ev.Rune(); r != 0 {
+			eb.insert(r)
 			eb.updateBind()
 		}
 	}
 }
 
 //
-func (eb *EditBox) HandleClick(ev termbox.Event) {
-
-	// fmt.Println("editbox", mouseX, mouseY)
-	if newCIdx := eb.windowIdx + ev.MouseX - eb.Padding.Left(); newCIdx-eb.windowIdx == 0 {
-		if eb.windowIdx > 0 {
-			eb.windowIdx--
+func (eb *EditBox) HandleClick(ev tcell.EventMouse) {
+	if btn := ev.Buttons(); btn == tcell.Button1 {
+		// fmt.Println("editbox", mouseX, mouseY)
+		x, _ := ev.Position()
+		if newCIdx := eb.windowIdx + x - eb.Padding.Left(); newCIdx-eb.windowIdx == 0 {
+			if eb.windowIdx > 0 {
+				eb.windowIdx--
+			}
+			eb.cursorIdx = newCIdx
+		} else if newCIdx > len(eb.text) {
+			eb.cursorIdx = len(eb.text)
+		} else if newCIdx-eb.windowIdx == eb.Width-1 { //&& len(eb.text) > eb.Width {
+			if eb.windowIdx+eb.Width < len(eb.text) {
+				eb.windowIdx++
+			}
+			eb.cursorIdx = newCIdx
+		} else if newCIdx < len(eb.text) && newCIdx-eb.windowIdx > 0 {
+			eb.cursorIdx = newCIdx
 		}
-		eb.cursorIdx = newCIdx
-	} else if newCIdx > len(eb.text) {
-		eb.cursorIdx = len(eb.text)
-	} else if newCIdx-eb.windowIdx == eb.Width-1 { //&& len(eb.text) > eb.Width {
-		if eb.windowIdx+eb.Width < len(eb.text) {
-			eb.windowIdx++
-		}
-		eb.cursorIdx = newCIdx
-	} else if newCIdx < len(eb.text) && newCIdx-eb.windowIdx > 0 {
-		eb.cursorIdx = newCIdx
 	}
+
 }
 
 //

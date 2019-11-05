@@ -1,7 +1,7 @@
-package tbui
+package tcui
 
 import (
-	termbox "github.com/nsf/termbox-go"
+	"github.com/gdamore/tcell"
 )
 
 //
@@ -82,10 +82,12 @@ func (dl *List) Size() (int, int) {
 }
 
 //
-func (dl *List) Handle(ev termbox.Event) {
-	if ev.Key == termbox.KeyArrowUp {
+
+//
+func (dl *List) Handle(ev tcell.EventKey) {
+	if k := ev.Key(); k == tcell.KeyUp {
 		dl.scrollUp()
-	} else if ev.Key == termbox.KeyArrowDown {
+	} else if k == tcell.KeyDown {
 		dl.scrollDown()
 	} else {
 		// pass event on to the next focusable thing in the item
@@ -101,21 +103,21 @@ func (dl *List) Handle(ev termbox.Event) {
 }
 
 //
-func (dl *List) HandleClick(ev termbox.Event) {
+func (dl *List) HandleClick(ev tcell.EventMouse) {
 	// fmt.Println("list", ev.MouseX, ev.MouseY)
 
-	switch ev.Key {
-	case termbox.MouseWheelDown:
+	switch btn := ev.Buttons(); btn {
+	case tcell.WheelDown:
 		if dl.WindowIndex+dl.visibleItems() < len(dl.Items) {
 			dl.WindowIndex++
 		}
 
-	case termbox.MouseWheelUp:
+	case tcell.WheelUp:
 		if dl.WindowIndex > 0 {
 			dl.WindowIndex--
 		}
 
-	case termbox.MouseLeft:
+	case tcell.Button1:
 		var sumY int
 
 		for i := dl.WindowIndex; i < len(dl.Items); i++ {
@@ -128,16 +130,17 @@ func (dl *List) HandleClick(ev termbox.Event) {
 				cw, ch = e.Size()
 			}
 
-			if ev.MouseX >= 0 && ev.MouseY >= sumY && ev.MouseX < cw && ev.MouseY < sumY+ch {
+			if x, y := ev.Position(); x >= 0 && y >= sumY && x < cw && y < sumY+ch {
 
 				// adjust the event before passing it down
-				ev.MouseY -= sumY
+				y -= sumY
+				newEv := *tcell.NewEventMouse(x, y, tcell.Button1, 0)
 
 				if clickable, ok := e.(Clickable); ok {
-					clickable.HandleClick(ev)
+					clickable.HandleClick(newEv)
 				}
 				if cont, ok := e.(Container); ok {
-					cont.FocusClicked(ev)
+					cont.FocusClicked(newEv)
 				}
 
 				// fire events and update bindings

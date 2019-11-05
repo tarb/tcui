@@ -1,9 +1,9 @@
-package tbui
+package tcui
 
 import (
 	"time"
 
-	termbox "github.com/nsf/termbox-go"
+	"github.com/gdamore/tcell"
 )
 
 // the different frames of the loading animation
@@ -14,20 +14,22 @@ var LoadingTick = 100 * time.Millisecond
 
 //
 type Loading struct {
+	Screen  tcell.Screen
 	Padding Padding
 }
 
 //
 func (l *Loading) Draw(x, y int, focused Element) {
-
+	style := tcell.StyleDefault.Foreground(White).Background(Black)
 	x, y = x+l.Padding.Left(), y+l.Padding.Up()
 	// counts 0,1,2,3,4,4,3,2,1,0 ... repeat
-	var n = time.Now().UnixNano() / int64(LoadingTick) % 10
+	n := time.Now().UnixNano() / int64(LoadingTick) % 10
 	n = n + (n / 5 * (((n % 5) * -2) - 1))
 
 	var i = 5
 	for _, c := range frames[n] {
-		termbox.SetCell(x+i, y, c, termbox.ColorWhite, termbox.ColorDefault)
+		l.Screen.SetContent(x+i, y, c, nil, style)
+
 		i++
 	}
 }

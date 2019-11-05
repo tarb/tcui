@@ -1,6 +1,8 @@
-package tbui
+package tcui
 
-import termbox "github.com/nsf/termbox-go"
+import (
+	"github.com/gdamore/tcell"
+)
 
 //
 type BorderSide uint8
@@ -39,8 +41,8 @@ var borderTypes = [][]rune{
 type Border struct {
 	Side  BorderSide
 	Style BorderType
-	Fg    termbox.Attribute
-	Bg    termbox.Attribute
+	Fg    tcell.Color
+	Bg    tcell.Color
 }
 
 //
@@ -103,11 +105,3 @@ func (p Padding) Down() int {
 	}
 	return p[[4]int{0, 0, 2, 2}[len(p)-1]]
 }
-
-//
-const (
-	ColBackground = termbox.ColorBlack
-	ColText       = termbox.ColorWhite
-	ColBorder     = termbox.ColorBlack | termbox.AttrBold
-	ColAccent     = termbox.ColorRed | termbox.AttrBold
-)

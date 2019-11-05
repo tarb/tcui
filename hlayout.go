@@ -1,11 +1,12 @@
-package tbui
+package tcui
 
 import (
-	termbox "github.com/nsf/termbox-go"
+	"github.com/gdamore/tcell"
 )
 
 //
 type HLayout struct {
+	Screen   tcell.Screen
 	Children []Element
 
 	MinHeight int
@@ -60,44 +61,45 @@ func (hl *HLayout) Size() (int, int) {
 
 func (hl *HLayout) drawBorder(x, y int) {
 	var runes []rune = hl.Border.Runes()
-	var fg, bg = hl.Border.Fg, hl.Border.Bg
-	var w, h int = hl.Size()
+	style := tcell.StyleDefault.Foreground(hl.Border.Fg).Background(hl.Border.Bg)
+	w, h := hl.Size()
 
 	// x
 	if hl.Border.Has(Up) {
 		for i := x; i < x+w; i++ {
-			termbox.SetCell(i, y, runes[0], fg, bg)
+			hl.Screen.SetContent(i, y, runes[0], nil, style)
 		}
 	}
 	if hl.Border.Has(Down) {
 		for i := x; i < x+w; i++ {
-			termbox.SetCell(i, y+h-1, runes[0], fg, bg)
+			hl.Screen.SetContent(i, y+h-1, runes[0], nil, style)
+
 		}
 	}
 	// y
 	if hl.Border.Has(Left) {
 		for i := y; i < y+h; i++ {
-			termbox.SetCell(x, i, runes[1], fg, bg)
+			hl.Screen.SetContent(x, i, runes[1], nil, style)
 		}
 	}
 	if hl.Border.Has(Right) {
 		for i := y; i < y+h; i++ {
-			termbox.SetCell(x+w-1, i, runes[1], fg, bg)
+			hl.Screen.SetContent(x+w-1, i, runes[1], nil, style)
 		}
 	}
 
 	// corners
 	if hl.Border.Has(Left | Up) {
-		termbox.SetCell(x, y, runes[2], fg, bg)
+		hl.Screen.SetContent(x, y, runes[2], nil, style)
 	}
 	if hl.Border.Has(Left | Down) {
-		termbox.SetCell(x, y+h-1, runes[4], fg, bg)
+		hl.Screen.SetContent(x, y+h-1, runes[4], nil, style)
 	}
 	if hl.Border.Has(Right | Up) {
-		termbox.SetCell(x+w-1, y, runes[3], fg, bg)
+		hl.Screen.SetContent(x+w-1, y, runes[3], nil, style)
 	}
 	if hl.Border.Has(Right | Down) {
-		termbox.SetCell(x+w-1, y+h-1, runes[5], fg, bg)
+		hl.Screen.SetContent(x+w-1, y+h-1, runes[5], nil, style)
 	}
 }
 
@@ -147,7 +149,7 @@ func (hl *HLayout) NextFocusable(current Focusable) Focusable {
 }
 
 //
-func (hl *HLayout) FocusClicked(ev termbox.Event) Focusable {
+func (hl *HLayout) FocusClicked(ev tcell.EventMouse) Focusable {
 	// var w, h int = hl.Size()
 
 	// termbox uses coords based from 1, 1 not 0, 0
@@ -163,23 +165,26 @@ func (hl *HLayout) FocusClicked(ev termbox.Event) Focusable {
 	// passed down to children
 
 	// adjust for padding
-	ev.MouseX, ev.MouseY = ev.MouseX-hl.Padding.Left()-hl.Border.Adjust(Left), ev.MouseY-hl.Padding.Up()-hl.Border.Adjust(Up)
+	x, y := ev.Position()
+	x, y = x-hl.Padding.Left()-hl.Border.Adjust(Left), y-hl.Padding.Up()-hl.Border.Adjust(Up)
 	// w, h = w-(hl.Padding.Left()+hl.Padding.Right())-(hl.Border.Left()+hl.Border.Right()), h-(hl.Padding.Up()+hl.Padding.Down())-(hl.Border.Up()+hl.Border.Down())
 
 	var sumX int
 	for _, c := range hl.Children {
 		var cw, ch int = c.Size()
 
-		if ev.MouseX >= sumX && ev.MouseY >= 0 && ev.MouseX <= sumX+cw && ev.MouseY <= ch {
+		if x >= sumX && y >= 0 && x <= sumX+cw && y <= ch {
 			// update event before passing it down
-			ev.MouseX -= sumX
+			x -= sumX
+
+			newEv := *tcell.NewEventMouse(x, y, tcell.Button1, 0)
 
 			if clickable, ok := c.(Clickable); ok {
-				clickable.HandleClick(ev)
+				clickable.HandleClick(newEv)
 			}
 
 			if cont, ok := c.(Container); ok {
-				return cont.FocusClicked(ev)
+				return cont.FocusClicked(newEv)
 			} else if foc, ok := c.(Focusable); ok {
 				return foc
 			}

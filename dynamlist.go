@@ -1,11 +1,12 @@
-package tbui
+package tcui
 
 import (
-	termbox "github.com/nsf/termbox-go"
+	"github.com/gdamore/tcell"
 )
 
 //
 type DynamicList struct {
+	Screen      tcell.Screen
 	BindBuilder func(int) Element
 	BindSize    func() int
 	BindIndex   *int
@@ -83,10 +84,10 @@ func (dl *DynamicList) Size() (int, int) {
 }
 
 //
-func (dl *DynamicList) Handle(ev termbox.Event) {
-	if ev.Key == termbox.KeyArrowUp {
+func (dl *DynamicList) Handle(ev tcell.EventKey) {
+	if k := ev.Key(); k == tcell.KeyUp {
 		dl.scrollUp()
-	} else if ev.Key == termbox.KeyArrowDown {
+	} else if k == tcell.KeyDown {
 		dl.scrollDown()
 	} else {
 		// pass event on to the next focusable thing in the item
@@ -102,21 +103,21 @@ func (dl *DynamicList) Handle(ev termbox.Event) {
 }
 
 //
-func (dl *DynamicList) HandleClick(ev termbox.Event) {
+func (dl *DynamicList) HandleClick(ev tcell.EventMouse) {
 	// fmt.Println("list", ev.MouseX, ev.MouseY)
 
-	switch ev.Key {
-	case termbox.MouseWheelDown:
+	switch btn := ev.Buttons(); btn {
+	case tcell.WheelDown:
 		if dl.WindowIndex+dl.visibleItems() < dl.BindSize() {
 			dl.WindowIndex++
 		}
 
-	case termbox.MouseWheelUp:
+	case tcell.WheelUp:
 		if dl.WindowIndex > 0 {
 			dl.WindowIndex--
 		}
 
-	case termbox.MouseLeft:
+	case tcell.Button1:
 		var sumY int
 
 		for i := dl.WindowIndex; i < dl.BindSize(); i++ {
@@ -129,16 +130,16 @@ func (dl *DynamicList) HandleClick(ev termbox.Event) {
 				cw, ch = e.Size()
 			}
 
-			if ev.MouseX >= 0 && ev.MouseY >= sumY && ev.MouseX < cw && ev.MouseY < sumY+ch {
+			if x, y := ev.Position(); x >= 0 && y >= sumY && x < cw && y < sumY+ch {
 
 				// adjust the event before passing it down
-				ev.MouseY -= sumY
+				y -= sumY
 
 				if clickable, ok := e.(Clickable); ok {
-					clickable.HandleClick(ev)
+					clickable.HandleClick(*tcell.NewEventMouse(x, y, tcell.Button1, 0))
 				}
 				if cont, ok := e.(Container); ok {
-					cont.FocusClicked(ev)
+					cont.FocusClicked(*tcell.NewEventMouse(x, y, tcell.Button1, 0))
 				}
 
 				// fire events and update bindings

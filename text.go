@@ -1,27 +1,30 @@
-package tbui
+package tcui
 
 import (
-	termbox "github.com/nsf/termbox-go"
+	"github.com/gdamore/tcell"
 )
 
 //
 type Text struct {
+	Screen  tcell.Screen
 	Text    string
 	DText   func() string
 	Width   int
 	Align   Align
 	Padding Padding
-	BgCol   termbox.Attribute
-	TextCol termbox.Attribute
+	BgCol   tcell.Color
+	TextCol tcell.Color
 }
 
 //
 func (t *Text) Draw(x, y int, focused Element) {
+	style := tcell.StyleDefault.Foreground(t.TextCol).Background(t.BgCol)
+
 	// background shading
-	var cw, rh int = t.Size()
+	cw, rh := t.Size()
 	for r := y; r < y+rh; r++ {
 		for c := x; c < x+cw; c++ {
-			termbox.SetCell(c, r, ' ', t.BgCol, t.BgCol)
+			t.Screen.SetContent(c, r, ' ', nil, style)
 		}
 	}
 
@@ -42,7 +45,7 @@ func (t *Text) Draw(x, y int, focused Element) {
 	}
 
 	for i, c := range t.Text[:w] {
-		termbox.SetCell(x+i, y, c, t.TextCol, t.BgCol)
+		t.Screen.SetContent(x+i, y, c, nil, style)
 	}
 }
 

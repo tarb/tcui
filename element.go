@@ -1,6 +1,8 @@
-package tbui
+package tcui
 
-import termbox "github.com/nsf/termbox-go"
+import (
+	"github.com/gdamore/tcell"
+)
 
 //
 type Element interface {
@@ -18,13 +20,13 @@ type Expandable interface {
 //
 type Focusable interface {
 	Element
-	Handle(termbox.Event)
+	Handle(tcell.EventKey)
 }
 
 //
 type Clickable interface {
 	Element
-	HandleClick(termbox.Event)
+	HandleClick(tcell.EventMouse)
 }
 
 //
@@ -32,5 +34,5 @@ type Container interface {
 	Element
 	NextFocusable(Focusable) Focusable
 	GetFocusable() []Focusable
-	FocusClicked(termbox.Event) Focusable
+	FocusClicked(tcell.EventMouse) Focusable
 }

@@ -1,4 +1,4 @@
-package tbui
+package tcui
 
 //
 type Func struct {
