@@ -1,4 +1,4 @@
-module github/tarb/tcui
+module github.com/tarb/tcui
 
 go 1.13
 
