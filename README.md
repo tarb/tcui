@@ -1,13 +1,13 @@
 # tbui
 
-Simple extension to the nsf/termbox-go library to allow for quickly creating terminal ui forms
+Simple extension to the tcell library to allow for quickly creating terminal ui forms
 
 ### Use
 A full example is available in the examples,
 
 ```go
 
-import ui "github.com/tarb/util/tbui"
+import ui "github.com/tarb/util/tcui"
 
 ...
 
