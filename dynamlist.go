@@ -7,22 +7,28 @@ import (
 //
 type DynamicList struct {
 	Screen      tcell.Screen
-	BindBuilder func(int) Element
+	BindBuilder func(int, Theme) Element
 	BindSize    func() int
 	BindIndex   *int
 	Index       int
 	WindowIndex int
 	Height      int
 	OnChange    func(int)
+	Theme       Theme
 }
 
 //
 func (dl *DynamicList) Draw(x, y int, focus Element) {
-	var eX, eY int = x, y
-	var sumH int
+	theme := dl.Theme
+	if theme == nil {
+		theme = DefaultTheme
+	}
+
+	eX, eY := x, y
+	sumH := 0
 
 	for i := dl.WindowIndex; i < dl.BindSize(); i++ {
-		var e = dl.BindBuilder(i)
+		e := dl.BindBuilder(i, theme)
 
 		var listFocus Element
 		if i == dl.Index {
@@ -39,8 +45,7 @@ func (dl *DynamicList) Draw(x, y int, focus Element) {
 			draw = e.Draw
 		}
 
-		var eH int
-		_, eH = size()
+		_, eH := size()
 
 		if sumH+eH > dl.Height {
 			break
@@ -59,12 +64,16 @@ func (dl *DynamicList) Draw(x, y int, focus Element) {
 
 //
 func (dl *DynamicList) Size() (int, int) {
-	var maxX, sumY int
+	theme := dl.Theme
+	if theme == nil {
+		theme = DefaultTheme
+	}
+	maxX, sumY := 0, 0
 
 	for i := dl.WindowIndex; i < dl.BindSize(); i++ {
-		var e = dl.BindBuilder(i)
+		e := dl.BindBuilder(i, theme)
 
-		var eW, eH int
+		eW, eH := 0, 0
 		if ex, ok := e.(Expandable); ok && i == dl.Index {
 			eW, eH = ex.ExpandSize()
 		} else {
@@ -84,14 +93,23 @@ func (dl *DynamicList) Size() (int, int) {
 }
 
 //
+func (dl *DynamicList) SetTheme(theme Theme) {
+	dl.Theme = theme
+}
+
+//
 func (dl *DynamicList) Handle(ev tcell.EventKey) {
 	if k := ev.Key(); k == tcell.KeyUp {
 		dl.scrollUp()
 	} else if k == tcell.KeyDown {
 		dl.scrollDown()
 	} else {
+		theme := dl.Theme
+		if theme == nil {
+			theme = DefaultTheme
+		}
 		// pass event on to the next focusable thing in the item
-		var e = dl.BindBuilder(dl.Index)
+		e := dl.BindBuilder(dl.Index, theme)
 		if cont, ok := e.(Container); ok {
 			if foc := cont.NextFocusable(nil); foc != nil {
 				foc.Handle(ev)
@@ -115,12 +133,16 @@ func (dl *DynamicList) HandleClick(ev tcell.EventMouse) {
 			dl.WindowIndex--
 		}
 	} else if btn&tcell.Button1 != 0 {
-		var sumY int
+		theme := dl.Theme
+		if theme == nil {
+			theme = DefaultTheme
+		}
 
+		sumY := 0
 		for i := dl.WindowIndex; i < dl.BindSize(); i++ {
-			var e = dl.BindBuilder(i)
+			e := dl.BindBuilder(i, theme)
 
-			var cw, ch int
+			cw, ch := 0, 0
 			if ex, ok := e.(Expandable); ok && i == dl.Index {
 				cw, ch = ex.ExpandSize()
 			} else {
@@ -165,7 +187,7 @@ func (dl *DynamicList) HandleClick(ev tcell.EventMouse) {
 
 //
 func (dl *DynamicList) scrollDown() {
-	var lastIndex = dl.BindSize() - 1
+	lastIndex := dl.BindSize() - 1
 
 	if dl.Index < lastIndex {
 		dl.Index++
@@ -176,16 +198,21 @@ func (dl *DynamicList) scrollDown() {
 			dl.OnChange(dl.Index)
 		}
 
-		var idx = dl.Index
+		theme := dl.Theme
+		if theme == nil {
+			theme = DefaultTheme
+		}
+
+		idx := dl.Index
 		if idx < lastIndex {
 			idx++
 		}
 
-		var sumY int
+		sumY := 0
 		for i := idx; i >= 0; i-- {
-			var e = dl.BindBuilder(i)
+			e := dl.BindBuilder(i, theme)
 
-			var eh int
+			eh := 0
 			if ex, ok := e.(Expandable); ok && i == dl.Index {
 				_, eh = ex.ExpandSize()
 			} else {
@@ -223,12 +250,16 @@ func (dl *DynamicList) scrollUp() {
 
 //
 func (dl *DynamicList) visibleItems() int {
-	var sumY, count int
+	theme := dl.Theme
+	if theme == nil {
+		theme = DefaultTheme
+	}
+	sumY, count := 0, 0
 
 	for i := dl.WindowIndex; i < dl.BindSize(); i++ {
-		var e = dl.BindBuilder(i)
+		e := dl.BindBuilder(i, theme)
 
-		var _, ch int
+		ch := 0
 		if ex, ok := e.(Expandable); ok && i == dl.Index {
 			_, ch = ex.ExpandSize()
 		} else {

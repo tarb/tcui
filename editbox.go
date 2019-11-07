@@ -16,7 +16,7 @@ type EditBox struct {
 	Submit      func()
 	OnUpdate    func([]rune, int)
 	Bind        *string
-	Theme       *Theme
+	Theme       Theme
 
 	text      []rune
 	cursorIdx int
@@ -32,12 +32,12 @@ func (eb *EditBox) Draw(x, y int, focused Element) {
 
 	x, y = x+eb.Padding.Left(), y+1 // so x ==0 && y ==0 is the location of the first char
 
-	style1 := tcell.StyleDefault.Foreground(theme.TextCol).Background(theme.ElementCol)       // default style with text
-	style2 := tcell.StyleDefault.Foreground(theme.ElementCol).Background(theme.BackgroundCol) // style with special width chars
+	style1 := tcell.StyleDefault.Foreground(theme.TextCol()).Background(theme.ElementCol())       // default style with text
+	style2 := tcell.StyleDefault.Foreground(theme.ElementCol()).Background(theme.BackgroundCol()) // style with special width chars
 	if focused == eb {
-		style1 = tcell.StyleDefault.Foreground(theme.FocusTextCol).Background(theme.FocusElementCol)
+		style1 = tcell.StyleDefault.Foreground(theme.FocusTextCol()).Background(theme.FocusElementCol())
 	}
-	cursorStyle := tcell.StyleDefault.Foreground(theme.CursorCol).Background(theme.CursorBackgroundCol) // style with special width chars
+	cursorStyle := tcell.StyleDefault.Foreground(theme.CursorCol()).Background(theme.CursorBackgroundCol()) // style with special width chars
 
 	//draw background box
 	for i := -eb.Padding.Left(); i < eb.Width+eb.Padding.Right(); i++ {
@@ -98,6 +98,11 @@ func (eb *EditBox) Draw(x, y int, focused Element) {
 //
 func (eb *EditBox) Size() (int, int) {
 	return eb.Padding.Left() + eb.Width + eb.Padding.Right(), 3
+}
+
+//
+func (eb *EditBox) SetTheme(theme Theme) {
+	eb.Theme = theme
 }
 
 //

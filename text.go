@@ -12,13 +12,17 @@ type Text struct {
 	Width   int
 	Align   Align
 	Padding Padding
-	BgCol   tcell.Color
-	TextCol tcell.Color
+	Theme   Theme
 }
 
 //
 func (t *Text) Draw(x, y int, focused Element) {
-	style := tcell.StyleDefault.Foreground(t.TextCol).Background(t.BgCol)
+	theme := t.Theme
+	if theme == nil {
+		theme = DefaultTheme
+	}
+
+	style := tcell.StyleDefault.Foreground(theme.TextCol()).Background(theme.BackgroundCol())
 
 	// background shading
 	cw, rh := t.Size()
@@ -56,4 +60,9 @@ func (t *Text) Size() (int, int) {
 		w = t.Width
 	}
 	return t.Padding.Left() + t.Padding.Right() + w, t.Padding.Up() + t.Padding.Down() + 1
+}
+
+//
+func (t *Text) SetTheme(theme Theme) {
+	t.Theme = theme
 }

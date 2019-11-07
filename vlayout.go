@@ -55,6 +55,13 @@ func (vl *VLayout) Size() (int, int) {
 }
 
 //
+func (vl *VLayout) SetTheme(theme Theme) {
+	for _, e := range vl.Children {
+		e.SetTheme(theme)
+	}
+}
+
+//
 // func (vl *VLayout) HandleClick(mouseX, mouseY int) {
 // 	fmt.Println("vlayout", vl.Border, "|", mouseX, mouseY, vl.Padding)
 // }

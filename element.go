@@ -8,6 +8,7 @@ import (
 type Element interface {
 	Draw(int, int, Element)
 	Size() (int, int)
+	SetTheme(Theme)
 }
 
 //

@@ -83,6 +83,11 @@ func (dl *List) Size() (int, int) {
 }
 
 //
+func (dl *List) SetTheme(theme Theme) {
+	for _, e := range dl.Items {
+		e.SetTheme(theme)
+	}
+}
 
 //
 func (dl *List) Handle(ev tcell.EventKey) {

@@ -55,6 +55,13 @@ func (hl *HLayout) Size() (int, int) {
 }
 
 //
+func (hl *HLayout) SetTheme(theme Theme) {
+	for _, e := range hl.Children {
+		e.SetTheme(theme)
+	}
+}
+
+//
 // func (hl *HLayout) HandleClick(mouseX, mouseY int) {
 // 	fmt.Println("hlayout", hl.Border, "|", mouseX, mouseY, hl.Padding)
 // }

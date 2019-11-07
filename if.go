@@ -24,6 +24,11 @@ func (ifl *If) Size() (int, int) {
 }
 
 //
+func (ifl *If) SetTheme(theme Theme) {
+	ifl.Child.SetTheme(theme)
+}
+
+//
 func (ifl *If) GetFocusable() []Focusable {
 	if cont, ok := ifl.Child.(Container); ok {
 		return cont.GetFocusable()

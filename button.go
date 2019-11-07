@@ -10,7 +10,7 @@ type Button struct {
 	Text    string
 	Padding Padding
 	Submit  func()
-	Theme   *Theme
+	Theme   Theme
 }
 
 //
@@ -20,11 +20,11 @@ func (b *Button) Draw(x, y int, focused Element) {
 		theme = DefaultTheme
 	}
 
-	style1 := tcell.StyleDefault.Foreground(theme.TextCol).Background(theme.ElementCol)       // default style with text
-	style2 := tcell.StyleDefault.Foreground(theme.ElementCol).Background(theme.BackgroundCol) // style with special width chars
+	style1 := tcell.StyleDefault.Foreground(theme.TextCol()).Background(theme.ElementCol())       // default style with text
+	style2 := tcell.StyleDefault.Foreground(theme.ElementCol()).Background(theme.BackgroundCol()) // style with special width chars
 	if focused == b {
-		style1 = tcell.StyleDefault.Foreground(theme.FocusTextCol).Background(theme.FocusElementCol)
-		style2 = tcell.StyleDefault.Foreground(theme.FocusElementCol).Background(theme.BackgroundCol)
+		style1 = tcell.StyleDefault.Foreground(theme.FocusTextCol()).Background(theme.FocusElementCol())
+		style2 = tcell.StyleDefault.Foreground(theme.FocusElementCol()).Background(theme.BackgroundCol())
 	}
 
 	x, y = x+b.Padding.Left(), y+1 // so x ==0 && y ==0 is the location of the first char
@@ -49,6 +49,11 @@ func (b *Button) Size() (int, int) {
 }
 
 //
+func (b *Button) SetTheme(theme Theme) {
+	b.Theme = theme
+}
+
+//
 func (b *Button) Handle(ev tcell.EventKey) {
 	switch ev.Key() {
 	case tcell.KeyEnter:
@@ -68,5 +73,4 @@ func (b *Button) HandleClick(ev tcell.EventMouse) {
 			}
 		}
 	}
-
 }
