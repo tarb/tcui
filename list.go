@@ -6,6 +6,7 @@ import (
 
 //
 type List struct {
+	Screen      tcell.Screen
 	Items       []Element
 	BindIndex   *int
 	Index       int
