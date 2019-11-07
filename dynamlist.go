@@ -106,18 +106,15 @@ func (dl *DynamicList) Handle(ev tcell.EventKey) {
 func (dl *DynamicList) HandleClick(ev tcell.EventMouse) {
 	// fmt.Println("list", ev.MouseX, ev.MouseY)
 
-	switch btn := ev.Buttons(); btn {
-	case tcell.WheelDown:
+	if btn := ev.Buttons(); btn&tcell.WheelDown != 0 {
 		if dl.WindowIndex+dl.visibleItems() < dl.BindSize() {
 			dl.WindowIndex++
 		}
-
-	case tcell.WheelUp:
+	} else if btn&tcell.WheelUp != 0 {
 		if dl.WindowIndex > 0 {
 			dl.WindowIndex--
 		}
-
-	case tcell.Button1:
+	} else if btn&tcell.Button1 != 0 {
 		var sumY int
 
 		for i := dl.WindowIndex; i < dl.BindSize(); i++ {
@@ -162,7 +159,6 @@ func (dl *DynamicList) HandleClick(ev tcell.EventMouse) {
 			}
 			sumY += ch
 		}
-
 	}
 
 }

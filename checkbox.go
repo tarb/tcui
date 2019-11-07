@@ -57,7 +57,7 @@ func (cb *CheckBox) Handle(ev tcell.EventKey) {
 //
 func (cb *CheckBox) HandleClick(ev tcell.EventMouse) {
 	//fmt.Println("checkbox", mouseX, mouseY, cb.Padding)
-	if ev.Buttons() == tcell.Button1 {
+	if ev.Buttons()&tcell.Button1 != 0 {
 		if x, y := ev.Position(); x >= cb.Padding.Left() && x < cb.Padding.Left()+3 && y >= cb.Padding.Up() && y < cb.Padding.Up()+1 {
 			cb.check()
 		}

@@ -58,7 +58,7 @@ func (b *Button) Handle(ev tcell.EventKey) {
 //
 func (b *Button) HandleClick(ev tcell.EventMouse) {
 	//fmt.Println("button", ev.MouseX, ev.MouseY, b.Padding)
-	if ev.Buttons() == tcell.Button1 {
+	if ev.Buttons()&tcell.Button1 != 0 {
 		if x, y := ev.Position(); x >= 0 && x < b.Padding.Left()+len(b.Text)+b.Padding.Right() && y >= 0 && y < 3 {
 			if b.Submit != nil {
 				b.Submit()

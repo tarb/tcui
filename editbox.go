@@ -136,7 +136,7 @@ func (eb *EditBox) Handle(ev tcell.EventKey) {
 
 //
 func (eb *EditBox) HandleClick(ev tcell.EventMouse) {
-	if btn := ev.Buttons(); btn == tcell.Button1 {
+	if btn := ev.Buttons(); btn&tcell.Button1 != 0 {
 		// fmt.Println("editbox", mouseX, mouseY)
 		x, _ := ev.Position()
 		if newCIdx := eb.windowIdx + x - eb.Padding.Left(); newCIdx-eb.windowIdx == 0 {
