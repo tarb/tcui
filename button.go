@@ -9,31 +9,34 @@ type Button struct {
 	Screen  tcell.Screen
 	Text    string
 	Padding Padding
-
-	Submit func()
+	Submit  func()
+	Theme   *Theme
 }
 
 //
 func (b *Button) Draw(x, y int, focused Element) {
-	var runes = []rune(b.Text)
+	theme := b.Theme
+	if theme == nil {
+		theme = DefaultTheme
+	}
 
-	style1 := tcell.StyleDefault.Foreground(Gray).Background(LightBlack)  // default style with text
-	style2 := tcell.StyleDefault.Foreground(LightBlack).Background(Black) // style with special width chars
+	style1 := tcell.StyleDefault.Foreground(theme.TextCol).Background(theme.ElementCol)       // default style with text
+	style2 := tcell.StyleDefault.Foreground(theme.ElementCol).Background(theme.BackgroundCol) // style with special width chars
 	if focused == b {
-		style1 = tcell.StyleDefault.Foreground(White).Background(LightBlack)
-		style2 = tcell.StyleDefault.Foreground(LightBlack).Background(Black)
+		style1 = tcell.StyleDefault.Foreground(theme.FocusTextCol).Background(theme.FocusElementCol)
+		style2 = tcell.StyleDefault.Foreground(theme.FocusElementCol).Background(theme.BackgroundCol)
 	}
 
 	x, y = x+b.Padding.Left(), y+1 // so x ==0 && y ==0 is the location of the first char
 
 	//draw background box
-	for i := -b.Padding.Left(); i < len(runes)+b.Padding.Right(); i++ {
+	for i := -b.Padding.Left(); i < len(b.Text)+b.Padding.Right(); i++ {
 
 		b.Screen.SetContent(x+i, y-1, '▄', nil, style2)
 		b.Screen.SetContent(x+i, y+1, '▀', nil, style2)
 
 		if i >= 0 && i < len(b.Text) {
-			b.Screen.SetContent(x+i, y, runes[i], nil, style1)
+			b.Screen.SetContent(x+i, y, rune(b.Text[i]), nil, style1)
 		} else {
 			b.Screen.SetContent(x+i, y, ' ', nil, style1)
 		}

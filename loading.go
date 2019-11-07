@@ -16,11 +16,16 @@ var LoadingTick = 100 * time.Millisecond
 type Loading struct {
 	Screen  tcell.Screen
 	Padding Padding
+	Theme   *Theme
 }
 
 //
 func (l *Loading) Draw(x, y int, focused Element) {
-	style := tcell.StyleDefault.Foreground(White).Background(Black)
+	theme := l.Theme
+	if theme == nil {
+		theme = DefaultTheme
+	}
+	style := tcell.StyleDefault.Foreground(theme.LoadingCol).Background(theme.BackgroundCol)
 	x, y = x+l.Padding.Left(), y+l.Padding.Up()
 	// counts 0,1,2,3,4,4,3,2,1,0 ... repeat
 	n := time.Now().UnixNano() / int64(LoadingTick) % 10

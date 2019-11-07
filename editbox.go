@@ -13,10 +13,10 @@ type EditBox struct {
 	HideContent bool
 	Padding     Padding
 	PlaceHolder string
-
-	Submit   func()
-	OnUpdate func([]rune, int)
-	Bind     *string
+	Submit      func()
+	OnUpdate    func([]rune, int)
+	Bind        *string
+	Theme       *Theme
 
 	text      []rune
 	cursorIdx int
@@ -25,14 +25,19 @@ type EditBox struct {
 
 //
 func (eb *EditBox) Draw(x, y int, focused Element) {
+	theme := eb.Theme
+	if theme == nil {
+		theme = DefaultTheme
+	}
+
 	x, y = x+eb.Padding.Left(), y+1 // so x ==0 && y ==0 is the location of the first char
 
-	style1 := tcell.StyleDefault.Foreground(Gray).Background(LightBlack)  // default style with text
-	style2 := tcell.StyleDefault.Foreground(LightBlack).Background(Black) // style with special width chars
+	style1 := tcell.StyleDefault.Foreground(theme.TextCol).Background(theme.ElementCol)       // default style with text
+	style2 := tcell.StyleDefault.Foreground(theme.ElementCol).Background(theme.BackgroundCol) // style with special width chars
 	if focused == eb {
-		style1 = tcell.StyleDefault.Foreground(White).Background(LightBlack)
+		style1 = tcell.StyleDefault.Foreground(theme.FocusTextCol).Background(theme.FocusElementCol)
 	}
-	cursorStyle := tcell.StyleDefault.Foreground(Black).Background(White) // style with special width chars
+	cursorStyle := tcell.StyleDefault.Foreground(theme.CursorCol).Background(theme.CursorBackgroundCol) // style with special width chars
 
 	//draw background box
 	for i := -eb.Padding.Left(); i < eb.Width+eb.Padding.Right(); i++ {

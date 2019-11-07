@@ -13,17 +13,23 @@ type CheckBox struct {
 	Padding Padding
 	Submit  func()
 	Bind    *bool
+	Theme   *Theme
 }
 
 //
 func (cb *CheckBox) Draw(x, y int, focused Element) {
+	theme := cb.Theme
+	if theme == nil {
+		theme = DefaultTheme
+	}
+
 	x, y = x+cb.Padding.Left(), y+cb.Padding.Up()
 
-	style1 := tcell.StyleDefault.Foreground(Red).Background(LightBlack)   // default style with check
-	style2 := tcell.StyleDefault.Foreground(LightBlack).Background(Black) // style with special width chars
+	style1 := tcell.StyleDefault.Foreground(theme.CheckCol).Background(theme.ElementCol)      // default style with text
+	style2 := tcell.StyleDefault.Foreground(theme.ElementCol).Background(theme.BackgroundCol) // style with special width chars
 	if focused == cb {
-		style1 = tcell.StyleDefault.Foreground(White).Background(LightBlack)
-		style2 = tcell.StyleDefault.Foreground(LightBlack).Background(Black)
+		style1 = tcell.StyleDefault.Foreground(theme.FocusCheckCol).Background(theme.FocusElementCol)
+		style2 = tcell.StyleDefault.Foreground(theme.FocusElementCol).Background(theme.BackgroundCol)
 	}
 
 	mark := ' '
