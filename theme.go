@@ -20,7 +20,7 @@ type Theme interface {
 }
 
 //
-type DefaulTheme struct {
+type TcuiTheme struct {
 	textCol             tcell.Color
 	focusTextCol        tcell.Color
 	boldTextCol         tcell.Color
@@ -37,46 +37,46 @@ type DefaulTheme struct {
 }
 
 //
-func (t DefaulTheme) TextCol() tcell.Color { return t.textCol }
+func (t TcuiTheme) TextCol() tcell.Color { return t.textCol }
 
 //
-func (t DefaulTheme) FocusTextCol() tcell.Color { return t.focusTextCol }
+func (t TcuiTheme) FocusTextCol() tcell.Color { return t.focusTextCol }
 
 //
-func (t DefaulTheme) BoldTextCol() tcell.Color { return t.boldTextCol }
+func (t TcuiTheme) BoldTextCol() tcell.Color { return t.boldTextCol }
 
 //
-func (t DefaulTheme) FocusBoldTextCol() tcell.Color { return t.focusBoldTextCol }
+func (t TcuiTheme) FocusBoldTextCol() tcell.Color { return t.focusBoldTextCol }
 
 //
-func (t DefaulTheme) ElementCol() tcell.Color { return t.elementCol }
+func (t TcuiTheme) ElementCol() tcell.Color { return t.elementCol }
 
 //
-func (t DefaulTheme) FocusElementCol() tcell.Color { return t.focusElementCol }
+func (t TcuiTheme) FocusElementCol() tcell.Color { return t.focusElementCol }
 
 //
-func (t DefaulTheme) BackgroundCol() tcell.Color { return t.backgroundCol }
+func (t TcuiTheme) BackgroundCol() tcell.Color { return t.backgroundCol }
 
 //
-func (t DefaulTheme) CheckCol() tcell.Color { return t.checkCol }
+func (t TcuiTheme) CheckCol() tcell.Color { return t.checkCol }
 
 //
-func (t DefaulTheme) FocusCheckCol() tcell.Color { return t.focusCheckCol }
+func (t TcuiTheme) FocusCheckCol() tcell.Color { return t.focusCheckCol }
 
 //
-func (t DefaulTheme) CursorCol() tcell.Color { return t.cursorCol }
+func (t TcuiTheme) CursorCol() tcell.Color { return t.cursorCol }
 
 //
-func (t DefaulTheme) CursorBackgroundCol() tcell.Color { return t.cursorBackgroundCol }
+func (t TcuiTheme) CursorBackgroundCol() tcell.Color { return t.cursorBackgroundCol }
 
 //
-func (t DefaulTheme) TextPlaceholderCol() tcell.Color { return t.textPlaceholderCol }
+func (t TcuiTheme) TextPlaceholderCol() tcell.Color { return t.textPlaceholderCol }
 
 //
-func (t DefaulTheme) LoadingCol() tcell.Color { return t.loadingCol }
+func (t TcuiTheme) LoadingCol() tcell.Color { return t.loadingCol }
 
 //
-var DefaultTheme Theme = DefaulTheme{
+var DefaultTheme Theme = TcuiTheme{
 	textCol:             tcell.NewRGBColor(154, 160, 166),
 	focusTextCol:        tcell.NewRGBColor(232, 234, 237),
 	boldTextCol:         tcell.NewRGBColor(232, 234, 237),
