@@ -13,6 +13,7 @@ type HLayout struct {
 	MinWidth  int
 	Border    Border
 	Padding   Padding
+	Theme     Theme
 }
 
 //
@@ -56,6 +57,7 @@ func (hl *HLayout) Size() (int, int) {
 
 //
 func (hl *HLayout) SetTheme(theme Theme) {
+	hl.Theme = theme
 	for _, e := range hl.Children {
 		e.SetTheme(theme)
 	}
@@ -67,9 +69,14 @@ func (hl *HLayout) SetTheme(theme Theme) {
 // }
 
 func (hl *HLayout) drawBorder(x, y int) {
-	var runes []rune = hl.Border.Runes()
-	style := tcell.StyleDefault.Foreground(hl.Border.Fg).Background(hl.Border.Bg)
+	theme := hl.Theme
+	if theme == nil {
+		theme = DefaultTheme
+	}
+	style := tcell.StyleDefault.Foreground(theme.BorderForeground()).Background(theme.BorderBackground())
+
 	w, h := hl.Size()
+	runes := hl.Border.Runes()
 
 	// x
 	if hl.Border.Has(Up) {

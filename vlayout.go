@@ -13,6 +13,7 @@ type VLayout struct {
 	MinHeight int
 	Border    Border
 	Padding   Padding
+	Theme     Theme
 }
 
 //
@@ -56,6 +57,7 @@ func (vl *VLayout) Size() (int, int) {
 
 //
 func (vl *VLayout) SetTheme(theme Theme) {
+	vl.Theme = theme
 	for _, e := range vl.Children {
 		e.SetTheme(theme)
 	}
@@ -67,9 +69,15 @@ func (vl *VLayout) SetTheme(theme Theme) {
 // }
 
 func (vl *VLayout) drawBorder(x, y int) {
-	var runes []rune = vl.Border.Runes()
-	style := tcell.StyleDefault.Foreground(vl.Border.Fg).Background(vl.Border.Bg)
+
+	theme := vl.Theme
+	if theme == nil {
+		theme = DefaultTheme
+	}
+	style := tcell.StyleDefault.Foreground(theme.BorderForeground()).Background(theme.BorderBackground())
+
 	w, h := vl.Size()
+	runes := vl.Border.Runes()
 
 	// x
 	if vl.Border.Has(Up) {

@@ -17,6 +17,8 @@ type Theme interface {
 	CursorBackground() tcell.Color
 	TextPlaceholder() tcell.Color
 	Loading() tcell.Color
+	BorderBackground() tcell.Color
+	BorderForeground() tcell.Color
 }
 
 //
@@ -34,6 +36,8 @@ type TcuiTheme struct {
 	CursorBackgroundCol tcell.Color
 	TextPlaceholderCol  tcell.Color
 	LoadingCol          tcell.Color
+	BorderBackgroundCol tcell.Color
+	BorderForegroundCol tcell.Color
 }
 
 //
@@ -76,6 +80,12 @@ func (t TcuiTheme) TextPlaceholder() tcell.Color { return t.TextPlaceholderCol }
 func (t TcuiTheme) Loading() tcell.Color { return t.LoadingCol }
 
 //
+func (t TcuiTheme) BorderBackground() tcell.Color { return t.BorderBackgroundCol }
+
+//
+func (t TcuiTheme) BorderForeground() tcell.Color { return t.BorderForegroundCol }
+
+//
 var DefaultTheme Theme = TcuiTheme{
 	TextCol:             tcell.NewRGBColor(154, 160, 166),
 	FocusTextCol:        tcell.NewRGBColor(232, 234, 237),
@@ -90,4 +100,6 @@ var DefaultTheme Theme = TcuiTheme{
 	CursorBackgroundCol: tcell.NewRGBColor(138, 180, 248),
 	TextPlaceholderCol:  tcell.NewRGBColor(154, 160, 166),
 	LoadingCol:          tcell.NewRGBColor(232, 234, 237),
+	BorderBackgroundCol: tcell.NewRGBColor(32, 33, 36),
+	BorderForegroundCol: tcell.NewRGBColor(48, 49, 52),
 }
