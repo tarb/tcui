@@ -25,11 +25,11 @@ func (cb *CheckBox) Draw(x, y int, focused Element) {
 
 	x, y = x+cb.Padding.Left(), y+cb.Padding.Up()
 
-	style1 := tcell.StyleDefault.Foreground(theme.CheckCol()).Background(theme.ElementCol())      // default style with text
-	style2 := tcell.StyleDefault.Foreground(theme.ElementCol()).Background(theme.BackgroundCol()) // style with special width chars
+	style1 := tcell.StyleDefault.Foreground(theme.Check()).Background(theme.Element())      // default style with text
+	style2 := tcell.StyleDefault.Foreground(theme.Element()).Background(theme.Background()) // style with special width chars
 	if focused == cb {
-		style1 = tcell.StyleDefault.Foreground(theme.FocusCheckCol()).Background(theme.FocusElementCol())
-		style2 = tcell.StyleDefault.Foreground(theme.FocusElementCol()).Background(theme.BackgroundCol())
+		style1 = tcell.StyleDefault.Foreground(theme.FocusCheck()).Background(theme.FocusElement())
+		style2 = tcell.StyleDefault.Foreground(theme.FocusElement()).Background(theme.Background())
 	}
 
 	mark := ' '

@@ -26,7 +26,7 @@ func (l *Loading) Draw(x, y int, focused Element) {
 		theme = DefaultTheme
 	}
 
-	style := tcell.StyleDefault.Foreground(theme.LoadingCol()).Background(theme.BackgroundCol())
+	style := tcell.StyleDefault.Foreground(theme.Loading()).Background(theme.Background())
 	x, y = x+l.Padding.Left(), y+l.Padding.Up()
 	// counts 0,1,2,3,4,4,3,2,1,0 ... repeat
 	n := time.Now().UnixNano() / int64(LoadingTick) % 10

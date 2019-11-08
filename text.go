@@ -22,7 +22,7 @@ func (t *Text) Draw(x, y int, focused Element) {
 		theme = DefaultTheme
 	}
 
-	style := tcell.StyleDefault.Foreground(theme.TextCol()).Background(theme.BackgroundCol())
+	style := tcell.StyleDefault.Foreground(theme.Text()).Background(theme.Background())
 
 	// background shading
 	cw, rh := t.Size()
