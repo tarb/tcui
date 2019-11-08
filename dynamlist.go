@@ -153,12 +153,13 @@ func (dl *DynamicList) HandleClick(ev tcell.EventMouse) {
 
 				// adjust the event before passing it down
 				y -= sumY
+				newEv := *tcell.NewEventMouse(x, y, ev.Buttons(), ev.Modifiers())
 
 				if clickable, ok := e.(Clickable); ok {
-					clickable.HandleClick(*tcell.NewEventMouse(x, y, tcell.Button1, 0))
+					clickable.HandleClick(newEv)
 				}
 				if cont, ok := e.(Container); ok {
-					cont.FocusClicked(*tcell.NewEventMouse(x, y, tcell.Button1, 0))
+					cont.FocusClicked(newEv)
 				}
 
 				// fire events and update bindings

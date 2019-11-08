@@ -191,7 +191,7 @@ func (hl *HLayout) FocusClicked(ev tcell.EventMouse) Focusable {
 			// update event before passing it down
 			x -= sumX
 
-			newEv := *tcell.NewEventMouse(x, y, tcell.Button1, 0)
+			newEv := *tcell.NewEventMouse(x, y, ev.Buttons(), ev.Modifiers())
 
 			if clickable, ok := c.(Clickable); ok {
 				clickable.HandleClick(newEv)

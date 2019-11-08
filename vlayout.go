@@ -180,7 +180,7 @@ func (vl *VLayout) FocusClicked(ev tcell.EventMouse) Focusable {
 			// update coords
 			y -= sumY
 
-			newEv := *tcell.NewEventMouse(x, y, tcell.Button1, 0)
+			newEv := *tcell.NewEventMouse(x, y, ev.Buttons(), ev.Modifiers())
 
 			if clickable, ok := c.(Clickable); ok {
 				clickable.HandleClick(newEv)
