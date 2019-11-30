@@ -33,7 +33,10 @@ func (b *Button) Draw(x, y int, focused Element) {
 		style2 = tcell.StyleDefault.Foreground(theme.FocusElement()).Background(theme.Background())
 	}
 
-	x, y = x+b.Padding.Left(), y+1 // so x ==0 && y ==0 is the location of the first char
+	x = x + b.Padding.Left() // so x ==0 && y ==0 is the location of the first char
+	if !b.NoPad {
+		y++ // padd the text line down 1 for the upper padding
+	}
 
 	//draw background box
 	for i := -b.Padding.Left(); i < len(b.Text)+b.Padding.Right(); i++ {
