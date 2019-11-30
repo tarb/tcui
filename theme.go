@@ -19,9 +19,11 @@ type Theme interface {
 	Loading() tcell.Color
 	BorderBackground() tcell.Color
 	BorderForeground() tcell.Color
+	DisabledElement() tcell.Color
+	DisabledText() tcell.Color
 }
 
-//
+// TcuiTheme sample theme object implementing the Theme interface
 type TcuiTheme struct {
 	TextCol             tcell.Color
 	FocusTextCol        tcell.Color
@@ -38,6 +40,8 @@ type TcuiTheme struct {
 	LoadingCol          tcell.Color
 	BorderBackgroundCol tcell.Color
 	BorderForegroundCol tcell.Color
+	DisabledElementCol  tcell.Color
+	DisabledTextCol     tcell.Color
 }
 
 //
@@ -86,6 +90,12 @@ func (t TcuiTheme) BorderBackground() tcell.Color { return t.BorderBackgroundCol
 func (t TcuiTheme) BorderForeground() tcell.Color { return t.BorderForegroundCol }
 
 //
+func (t TcuiTheme) DisabledElement() tcell.Color { return t.DisabledElementCol }
+
+//
+func (t TcuiTheme) DisabledText() tcell.Color { return t.DisabledTextCol }
+
+//
 var DefaultTheme Theme = TcuiTheme{
 	TextCol:             tcell.NewRGBColor(154, 160, 166),
 	FocusTextCol:        tcell.NewRGBColor(232, 234, 237),
@@ -100,6 +110,8 @@ var DefaultTheme Theme = TcuiTheme{
 	CursorBackgroundCol: tcell.NewRGBColor(138, 180, 248),
 	TextPlaceholderCol:  tcell.NewRGBColor(154, 160, 166),
 	LoadingCol:          tcell.NewRGBColor(232, 234, 237),
-	BorderBackgroundCol: tcell.NewRGBColor(32, 33, 36),
 	BorderForegroundCol: tcell.NewRGBColor(48, 49, 52),
+	BorderBackgroundCol: tcell.NewRGBColor(32, 33, 36),
+	DisabledTextCol:     tcell.NewRGBColor(48, 49, 52),
+	DisabledElementCol:  tcell.NewRGBColor(32, 33, 36),
 }

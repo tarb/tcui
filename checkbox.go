@@ -8,12 +8,14 @@ import (
 type CheckBox struct {
 	Screen tcell.Screen
 
-	Checked bool
-	Symbol  rune
-	Padding Padding
-	Submit  func()
-	Bind    *bool
-	Theme   Theme
+	Checked    bool
+	Symbol     rune
+	Padding    Padding
+	Submit     func()
+	Bind       *bool
+	Theme      Theme
+	Disabled   bool
+	DisabledFn func() bool
 }
 
 //
@@ -30,6 +32,9 @@ func (cb *CheckBox) Draw(x, y int, focused Element) {
 	if focused == cb {
 		style1 = tcell.StyleDefault.Foreground(theme.FocusCheck()).Background(theme.FocusElement())
 		style2 = tcell.StyleDefault.Foreground(theme.FocusElement()).Background(theme.Background())
+	} else if cb.isDisabled() {
+		style1 = tcell.StyleDefault.Foreground(theme.DisabledText()).Background(theme.DisabledElement())
+		style2 = tcell.StyleDefault.Foreground(theme.DisabledElement()).Background(theme.Background())
 	}
 
 	mark := ' '
@@ -82,3 +87,5 @@ func (cb *CheckBox) check() {
 		*cb.Bind = cb.Checked
 	}
 }
+
+func (cb *CheckBox) isDisabled() bool { return cb.Disabled || (cb.DisabledFn != nil && cb.DisabledFn()) }

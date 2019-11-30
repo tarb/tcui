@@ -6,11 +6,13 @@ import (
 
 //
 type Button struct {
-	Screen  tcell.Screen
-	Text    string
-	Padding Padding
-	Submit  func()
-	Theme   Theme
+	Screen     tcell.Screen
+	Text       string
+	Padding    Padding
+	Submit     func()
+	Theme      Theme
+	Disabled   bool
+	DisabledFn func() bool
 }
 
 //
@@ -25,6 +27,9 @@ func (b *Button) Draw(x, y int, focused Element) {
 	if focused == b {
 		style1 = tcell.StyleDefault.Foreground(theme.FocusText()).Background(theme.FocusElement())
 		style2 = tcell.StyleDefault.Foreground(theme.FocusElement()).Background(theme.Background())
+	} else if b.isDisabled() {
+		style1 = tcell.StyleDefault.Foreground(theme.DisabledText()).Background(theme.DisabledElement())
+		style2 = tcell.StyleDefault.Foreground(theme.DisabledElement()).Background(theme.Background())
 	}
 
 	x, y = x+b.Padding.Left(), y+1 // so x ==0 && y ==0 is the location of the first char
@@ -49,12 +54,14 @@ func (b *Button) Size() (int, int) {
 }
 
 //
-func (b *Button) SetTheme(theme Theme) {
-	b.Theme = theme
-}
+func (b *Button) SetTheme(theme Theme) { b.Theme = theme }
 
 //
 func (b *Button) Handle(ev tcell.EventKey) {
+	if b.isDisabled() {
+		return
+	}
+
 	switch ev.Key() {
 	case tcell.KeyEnter:
 		if b.Submit != nil {
@@ -65,7 +72,10 @@ func (b *Button) Handle(ev tcell.EventKey) {
 
 //
 func (b *Button) HandleClick(ev tcell.EventMouse) {
-	//fmt.Println("button", ev.MouseX, ev.MouseY, b.Padding)
+	if b.isDisabled() {
+		return
+	}
+
 	if ev.Buttons()&tcell.Button1 != 0 {
 		if x, y := ev.Position(); x >= 0 && x < b.Padding.Left()+len(b.Text)+b.Padding.Right() && y >= 0 && y < 3 {
 			if b.Submit != nil {
@@ -74,3 +84,5 @@ func (b *Button) HandleClick(ev tcell.EventMouse) {
 		}
 	}
 }
+
+func (b *Button) isDisabled() bool { return b.Disabled || (b.DisabledFn != nil && b.DisabledFn()) }

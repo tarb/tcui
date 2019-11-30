@@ -1,4 +1,4 @@
-# tbui
+# tcui
 
 Simple extension to the tcell library to allow for quickly creating terminal ui forms
 
@@ -34,12 +34,8 @@ window := &ui.VLayout{
 window.Draw(0, 0, nil) // draw in the top left corner of the screen - with no element in focus
 
 ```
-Produces a terminal somewhat like
 
-<img src="_example/screenshot.png" width="500" />
-
-
-###Features
+### Features
 * Full mouse support
 * CSS style padding shortcut
 

@@ -17,6 +17,8 @@ type EditBox struct {
 	OnUpdate    func([]rune, int)
 	Bind        *string
 	Theme       Theme
+	Disabled    bool
+	DisabledFn  func() bool
 
 	text      []rune
 	cursorIdx int
@@ -36,6 +38,8 @@ func (eb *EditBox) Draw(x, y int, focused Element) {
 	style2 := tcell.StyleDefault.Foreground(theme.Element()).Background(theme.Background()) // style with special width chars
 	if focused == eb {
 		style1 = tcell.StyleDefault.Foreground(theme.FocusText()).Background(theme.FocusElement())
+	} else if eb.isDisabled() {
+		style1 = tcell.StyleDefault.Foreground(theme.DisabledText()).Background(theme.DisabledElement())
 	}
 	cursorStyle := tcell.StyleDefault.Foreground(theme.Cursor()).Background(theme.CursorBackground()) // style with special width chars
 
@@ -112,6 +116,10 @@ func (eb *EditBox) ExpandSize() (int, int) {
 
 //
 func (eb *EditBox) Handle(ev tcell.EventKey) {
+	if eb.isDisabled() {
+		return
+	}
+
 	switch k := ev.Key(); k {
 	case tcell.KeyEnter:
 		if eb.Submit != nil {
@@ -146,6 +154,10 @@ func (eb *EditBox) Handle(ev tcell.EventKey) {
 
 //
 func (eb *EditBox) HandleClick(ev tcell.EventMouse) {
+	if eb.isDisabled() {
+		return
+	}
+
 	if btn := ev.Buttons(); btn&tcell.Button1 != 0 {
 		// fmt.Println("editbox", mouseX, mouseY)
 		x, _ := ev.Position()
@@ -245,3 +257,5 @@ func (eb *EditBox) updateBind() {
 		*eb.Bind = string(eb.text)
 	}
 }
+
+func (eb *EditBox) isDisabled() bool { return eb.Disabled || (eb.DisabledFn != nil && eb.DisabledFn()) }
