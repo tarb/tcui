@@ -36,7 +36,7 @@ func (b *Button) Draw(x, y int, focused Element) {
 	x, y = x+b.Padding.Left(), y+1 // so x ==0 && y ==0 is the location of the first char
 
 	if b.NoPad {
-		y = 1 // no vertical padding and no background color when nopad
+		y = y - 1 // no vertical padding and no background color when nopad
 		style1 = tcell.StyleDefault.Background(theme.Background())
 	}
 
