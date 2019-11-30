@@ -11,8 +11,9 @@ type Button struct {
 	Padding    Padding
 	Submit     func()
 	Theme      Theme
-	Disabled   bool
 	DisabledFn func() bool
+	Disabled   bool
+	NoPad      bool
 }
 
 //
@@ -24,12 +25,12 @@ func (b *Button) Draw(x, y int, focused Element) {
 
 	style1 := tcell.StyleDefault.Foreground(theme.Text()).Background(theme.Element())       // default style with text
 	style2 := tcell.StyleDefault.Foreground(theme.Element()).Background(theme.Background()) // style with special width chars
-	if focused == b {
-		style1 = tcell.StyleDefault.Foreground(theme.FocusText()).Background(theme.FocusElement())
-		style2 = tcell.StyleDefault.Foreground(theme.FocusElement()).Background(theme.Background())
-	} else if b.isDisabled() {
+	if b.isDisabled() {
 		style1 = tcell.StyleDefault.Foreground(theme.DisabledText()).Background(theme.DisabledElement())
 		style2 = tcell.StyleDefault.Foreground(theme.DisabledElement()).Background(theme.Background())
+	} else if focused == b {
+		style1 = tcell.StyleDefault.Foreground(theme.FocusText()).Background(theme.FocusElement())
+		style2 = tcell.StyleDefault.Foreground(theme.FocusElement()).Background(theme.Background())
 	}
 
 	x, y = x+b.Padding.Left(), y+1 // so x ==0 && y ==0 is the location of the first char
@@ -37,8 +38,10 @@ func (b *Button) Draw(x, y int, focused Element) {
 	//draw background box
 	for i := -b.Padding.Left(); i < len(b.Text)+b.Padding.Right(); i++ {
 
-		b.Screen.SetContent(x+i, y-1, '▄', nil, style2)
-		b.Screen.SetContent(x+i, y+1, '▀', nil, style2)
+		if !b.NoPad {
+			b.Screen.SetContent(x+i, y-1, '▄', nil, style2)
+			b.Screen.SetContent(x+i, y+1, '▀', nil, style2)
+		}
 
 		if i >= 0 && i < len(b.Text) {
 			b.Screen.SetContent(x+i, y, rune(b.Text[i]), nil, style1)
@@ -46,10 +49,14 @@ func (b *Button) Draw(x, y int, focused Element) {
 			b.Screen.SetContent(x+i, y, ' ', nil, style1)
 		}
 	}
+
 }
 
 //
 func (b *Button) Size() (int, int) {
+	if b.NoPad {
+		return (b.Padding.Left() + b.Padding.Right()) + len(b.Text), 1
+	}
 	return (b.Padding.Left() + b.Padding.Right()) + len(b.Text), 3
 }
 

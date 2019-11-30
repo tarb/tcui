@@ -36,11 +36,12 @@ func (eb *EditBox) Draw(x, y int, focused Element) {
 
 	style1 := tcell.StyleDefault.Foreground(theme.Text()).Background(theme.Element())       // default style with text
 	style2 := tcell.StyleDefault.Foreground(theme.Element()).Background(theme.Background()) // style with special width chars
-	if focused == eb {
-		style1 = tcell.StyleDefault.Foreground(theme.FocusText()).Background(theme.FocusElement())
-	} else if eb.isDisabled() {
+	if eb.isDisabled() {
 		style1 = tcell.StyleDefault.Foreground(theme.DisabledText()).Background(theme.DisabledElement())
+	} else if focused == eb {
+		style1 = tcell.StyleDefault.Foreground(theme.FocusText()).Background(theme.FocusElement())
 	}
+
 	cursorStyle := tcell.StyleDefault.Foreground(theme.Cursor()).Background(theme.CursorBackground()) // style with special width chars
 
 	//draw background box
